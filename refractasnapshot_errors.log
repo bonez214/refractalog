@@ -1,0 +1,332 @@
++ [[ -f /usr/bin/yad ]]
++ DIALOG=yad
++ INFO=image=gtk-dialog-info
++ QUESTION=image=gtk-dialog-question
++ WARNING=image=gtk-dialog-warning
++ ERROR=image=gtk-dialog-error
++ BUTTON0=button
++ BUTTON1=button
++ BUTTON0NUM=:0
++ BUTTON1NUM=:1
++ CENTER=--center
++ [[ -n :0 ]]
+++ id -u
++ [[ 0 -eq 0 ]]
++ [[ yes = \y\e\s ]]
++ dpkg -l
++ grep '^ii'
++ grep grub-efi-amd64
++ grep -v bin
++ echo 'grub-efi-amd64 is not installed'
++ yad --image=gtk-dialog-warning --title=Warning --center --button=Continue --button=Exit:1 '--text=Warning: grub-efi-amd64 is not installed.\nThe snapshot may not be compatible with UEFI. To disable this warning, set make_efi=no in /etc/refractasnapshot.conf or set force_efi=yes for special use.\nforce_efi is no'
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ [[ 0 = 1 ]]
++ [[ no = \y\e\s ]]
++ make_efi=no
++ echo 'force_efi is no'
++ echo 'make_efi is no'
++ [[ ! -e /var/lib/dpkg/info/dosfstools.list ]]
++ yad --image=gtk-dialog-question '--title=Refracta Snapshot 10.0.3 (20170716)' --center --button=Next:0 --button=Setup:1 --width 580 '--text=Are you ready to create a live installable snapshot of your system? This utility will create a bootable image that you can burn to CD or DVD. The image will be stored in /home/snapshot.
+
+This is free software that comes with no warranty or guarantee of any type, including but not limited to express, implied, merchantability or fitness of purpose.
+Copyright 2011-2016 fsmithred@gmail.com  
+(portions may be copyright Dean Linkous)
+'
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ '[' 1 -ne 0 ']'
++ setup_snapshot
+++ yad --list '--title=Setup Options' --center '--text= Edit the config file to change settings.
+ Edit the excludes file to choose which files/directories will not be copied to the snapshot.
+ To skip this step, click OK with no boxes checked.
+' --checklist --column Choose --column Num --column Option --width=590 --height=330 --button=OK:0 --button=Exit:1 FALSE 01 'Edit /etc/refractasnapshot.conf' FALSE 02 'Edit and use custom excludes file.' FALSE 03 'Restore excludes file to defaults.'
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ opts=
++ [[ 0 -ne 0 ]]
+++ echo
+++ grep -q 01
+++ echo
+++ grep -q 02
+++ echo
+++ grep -q 03
++ yad --image=gtk-dialog-info '--title=Refracta Snapshot' --center '--text=This may take a moment while the program checks for free space.    ' --button=OK:0 --button=Exit:1
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ [[ 0 = 0 ]]
++ check_copies
++ [[ -d /home/snapshot ]]
++ ls '/home/snapshot/*.iso'
+ls: cannot access '/home/snapshot/*.iso': No such file or directory
++ snapshot_count=0
+++ du -sh /home/snapshot
+++ awk '{print $1}'
++ snapshot_size=4.0K
++ [[ -z 4.0K ]]
++ [[ -d /home/work/myfs ]]
++ [[ no = \y\e\s ]]
++ save_message='* The temporary copy of the filesystem will be created 
+at /home/work/myfs and removed when this program finishes.'
++ check_directories
+++ echo /home/snapshot
+++ awk -F / '{ print "/" $2 "/" $3 }'
+++ grep /media/
++ snapdir_is_remote=
+++ echo /home/work
+++ awk -F / '{ print "/" $2 "/" $3 }'
+++ grep /media/
++ workdir_is_remote=
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' -n '' ']'
++ [[ -d /home/snapshot ]]
++ [[ no = \n\o ]]
++ [[ -d /home/work ]]
++ mkdir -p /home/work/iso
++ mkdir -p /home/work/myfs
++ check_space
+++ df -h -x tmpfs -x devtmpfs -x iso9660 -x udf -x aufs -x squashfs
+++ sed 's/Mounted on/Mountpoint/'
+++ awk '{ print  $2 "  \t" $3 "  \t" $4 "  \t" $5 "   \t" $6 "   \t\t\t" $1 }'
+++ tee /dev/fd/63
++++ yad '--title=Checking disk space...' --center --progress --pulsate --auto-close --width 300
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ disk_space='Size  	Used  	Avail  	Use%   	Mountpoint   			Filesystem
+32G  	7.1G  	23G  	24%   	/   			/dev/sda3'
++ report_space
++ [[ no = \y\e\s ]]
++ uefi_message='uefi disabled'
+++ yad --list '--title=Disk Space and Settings Report' --center --height 600 --width 700 '--text=Please CLOSE any running applications NOW.
+Turn off NUM LOCK for some laptops.
+
+You will need plenty of free space. It is recommended that free space (Avail) in the partition that 
+holds the work directory (probably "/") should be two times the total installed system size (Used).
+(Note: You can deduct the space taken up by previous snapshots and any saved copies of the system from the Used amount.)    
+
+* You have 0 snapshots taking up 4.0K of disk space.
+
+* The temporary copy of the filesystem will be created 
+at /home/work/myfs and removed when this program finishes.
+* The snapshot directory is currently set to /home/snapshot
+
+
+You can change these and other settings by editing 
+/etc/refractasnapshot.conf.
+
+
+Current disk usage:
+(For complete listing, exit and run '\''df -h'\'')
+
+Size  	Used  	Avail  	Use%   	Mountpoint   			Filesystem
+32G  	7.1G  	23G  	24%   	/   			/dev/sda3
+' --column Num --column 'Choose a task' --button=OK:0 --button=Exit:1 01 'Create a snapshot (uefi disabled)' 02 'Re-squash and make iso (no-copy)' 03 'Re-make efi files and iso. (no-copy) (uefi disabled)' 04 'Re-run xorriso only. (make iso, no-copy, no-squash)'
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ task='01|Create a snapshot (uefi disabled)|'
++ exit_code=0
++ '[' 0 -ne 0 ']'
++ [[ 01|Create a snapshot (uefi disabled)| =~ 01 ]]
++ set_distro_name
++ [[ /usr/lib/refractasnapshot/iso = \/\u\s\r\/\l\i\b\/\r\e\f\r\a\c\t\a\s\n\a\p\s\h\o\t\/\i\s\o ]]
++ [[ live.cfg = \l\i\v\e\.\c\f\g ]]
+++ lsb_release -i -s
++ DISTRO=LinuxMint
+++ grep -q Refracta /etc/issue
+++ yad --entry '--title=Linux Distribution' --center '--text=This is the distribution name that will appear in the boot menu 
+for the live image. If it'\''s blank, the menu entries will just say 
+"GNU/Linux (kernel-version)" ' --entry-text=LinuxMint --width=500 --button=OK:0
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ DISTRO=LinuxMint
++ [[ -z LinuxMint ]]
++ housekeeping
++ [[ '' = \y\e\s ]]
++ [[ -n '' ]]
+++ awk -F: '/1000:1000/ { print $1 }' /etc/passwd
++ username=bonez
++ [[ bonez != user ]]
++ username_opt=username=bonez
++ [[ yes = \y\e\s ]]
++ find_editor
++ [[ -n '' ]]
++ [[ -e /usr/bin/geany ]]
++ [[ -e /usr/bin/leafpad ]]
++ [[ -e /usr/bin/mousepad ]]
++ [[ -e /usr/bin/pluma ]]
++ [[ -e /usr/bin/xed ]]
++ editor=/usr/bin/xed
++ [[ -e /vmlinuz ]]
++ [[ -e /initrd.img ]]
++ [[ -n '' ]]
++ [[ -n '' ]]
++ [[ yes = \y\e\s ]]
++ updatedb
++ tee /dev/fd/63
+++ yad '--title=Running updatedb...' --center --progress --pulsate --auto-close --width 300
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
+
+(yad:2126): GLib-CRITICAL **: g_source_remove: assertion 'tag > 0' failed
++ [[ '' = \y\e\s ]]
++ cd /home/work
++ copy_isolinux
++ [[ -f /usr/lib/ISOLINUX/isolinux.bin ]]
++ isolinuxbin=/usr/lib/ISOLINUX/isolinux.bin
++ [[ -f /usr/lib/syslinux/modules/bios/vesamenu.c32 ]]
++ vesamenu=/usr/lib/syslinux/modules/bios/vesamenu.c32
++ rsync -a /usr/lib/syslinux/modules/bios/chain.c32 /usr/lib/refractasnapshot/iso/isolinux/
++ rsync -a /usr/lib/syslinux/modules/bios/ldlinux.c32 /usr/lib/refractasnapshot/iso/isolinux/
++ rsync -a /usr/lib/syslinux/modules/bios/libcom32.c32 /usr/lib/refractasnapshot/iso/isolinux/
++ rsync -a /usr/lib/syslinux/modules/bios/libutil.c32 /usr/lib/refractasnapshot/iso/isolinux/
++ rsync -a /usr/lib/ISOLINUX/isolinux.bin /usr/lib/refractasnapshot/iso/isolinux/
++ rsync -a /usr/lib/syslinux/modules/bios/vesamenu.c32 /usr/lib/refractasnapshot/iso/isolinux/
++ [[ '' = \y\e\s ]]
++ copy_kernel
++ rsync -a /usr/lib/refractasnapshot/iso/ /home/work/iso/
++ cp /vmlinuz /home/work/iso/live/
++ cp /initrd.img /home/work/iso/live/
++ copy_filesystem
++ [[ no = \y\e\s ]]
++ rsync -av / myfs/ --delete-before --delete-excluded --exclude=/home/work --exclude=/home/snapshot --exclude=/home/work/efi-files --exclude-from=/usr/lib/refractasnapshot/snapshot_exclude.list
++ tee /dev/fd/63
+++ yad '--title=Copying filesystem...' --center --progress --pulsate --auto-close --width 300
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ [[ -n '' ]]
++ edit_system
++ find myfs/var/log -name '*gz' -print0
++ xargs -0r rm -f
++ find myfs/var/log/ -type f -exec truncate -s 0 '{}' ';'
++ [[ yes = \y\e\s ]]
++ [[ -f /home/work/myfs/etc/pmount.allow ]]
++ [[ yes = \y\e\s ]]
++ sed -i 's/recent_files=.*;/recent_files=/' /home/work/myfs/home/bonez/.config/geany/geany.conf
+sed: can't read /home/work/myfs/home/bonez/.config/geany/geany.conf: No such file or directory
++ [[ -e /home/work/myfs/lib/live/config/1161-openssh-server ]]
++ sed -i 's/PermitRootLogin yes/PermitRootLogin without-password/' /home/work/myfs/etc/ssh/sshd_config
+sed: can't read /home/work/myfs/etc/ssh/sshd_config: No such file or directory
++ [[ no = \y\e\s ]]
++ [[ no = \n\o ]]
++ sed -i 's|.*PasswordAuthentication.*yes|PasswordAuthentication no|' /home/work/myfs/etc/ssh/sshd_config
+sed: can't read /home/work/myfs/etc/ssh/sshd_config: No such file or directory
++ touch /home/work/myfs/etc/fstab
++ '[' -e /home/work/myfs/etc/machine-id ']'
++ rm -f /home/work/myfs/etc/machine-id
++ :
++ mknod -m 622 /home/work/myfs/dev/console c 5 1
++ mknod -m 666 /home/work/myfs/dev/null c 1 3
++ mknod -m 666 /home/work/myfs/dev/zero c 1 5
++ mknod -m 666 /home/work/myfs/dev/ptmx c 5 2
++ mknod -m 666 /home/work/myfs/dev/tty c 5 0
++ mknod -m 444 /home/work/myfs/dev/random c 1 8
++ mknod -m 444 /home/work/myfs/dev/urandom c 1 9
++ chown -v root:tty /home/work/myfs/dev/console /home/work/myfs/dev/ptmx /home/work/myfs/dev/tty
++ ln -sv /proc/self/fd /home/work/myfs/dev/fd
++ ln -sv /proc/self/fd/0 /home/work/myfs/dev/stdin
++ ln -sv /proc/self/fd/1 /home/work/myfs/dev/stdout
++ ln -sv /proc/self/fd/2 /home/work/myfs/dev/stderr
++ ln -sv /proc/kcore /home/work/myfs/dev/core
++ ln -sv /run/shm /home/work/myfs/dev/shm
++ mkdir -v /home/work/myfs/dev/pts
++ [[ -z '' ]]
++ echo '# The loopback network interface
+auto lo
+iface lo inet loopback
+'
++ rm -f '/home/work/myfs/var/lib/wicd/configurations/*'
++ rm -f /home/work/myfs/etc/wicd/wireless-settings.conf
++ rm -f '/home/work/myfs/etc/NetworkManager/system-connections/*'
++ rm -f '/home/work/myfs/etc/network/wifi/*'
++ get_filename
++ [[ datetime = \d\a\t\e\t\i\m\e ]]
+++ date +%Y%m%d_%H%M
++ filename=snapshot-20181209_1123.iso
++ [[ no = \y\e\s ]]
++ add_extras
++ dir_prefix=pkglist
++ for dir in '"$work_dir"/iso/"$dir_prefix"*'
++ rm -r '/home/work/iso/pkglist*'
+rm: cannot remove '/home/work/iso/pkglist*': No such file or directory
++ mkdir -p /home/work/iso/pkglist_snapshot-20181209_1123
++ dpkg -l
++ egrep 'ii|hi'
++ awk '{ print $2 }'
++ [[ -f /usr/share/doc/_Release_Notes/Release_Notes ]]
++ set_boot_options
++ '[' /usr/lib/refractasnapshot/iso = /usr/lib/refractasnapshot/iso ']'
++ sed -i 's:${DISTRO}:LinuxMint:g' /home/work/iso/isolinux/live.cfg
++ sed -i 's:${netconfig_opt}::g' /home/work/iso/isolinux/live.cfg
++ sed -i 's:${username_opt}:username=bonez:g' /home/work/iso/isolinux/live.cfg
++ [[ no = \y\e\s ]]
++ [[ yes = \y\e\s ]]
++ edit_boot_menus
++ [[ yes = \y\e\s ]]
++ [[ no = \y\e\s ]]
++ yad --image=gtk-dialog-question '--title=Edit Boot Menu' --center --button=Yes:0 --button=No:1 '--text=The program will now pause to allow you to edit any files in the work directory.
+Select Yes to review or edit the boot menu or select No 
+to bypass this step and continue creating the snapshot. '
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ [[ 0 = 0 ]]
++ /usr/bin/xed '' /home/work/iso/isolinux/live.cfg
+
+(xed:2267): Gtk-WARNING **: Calling Inhibit failed: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.gnome.SessionManager was not provided by any .service files
+
+** (xed:2267): WARNING **: Set document metadata failed: Setting attribute metadata::xed-spell-language not supported
+
+** (xed:2267): WARNING **: Set document metadata failed: Setting attribute metadata::xed-encoding not supported
+
+** (xed:2267): WARNING **: Set document metadata failed: Setting attribute metadata::xed-position not supported
+
+** (xed:2267): WARNING **: Set document metadata failed: Setting attribute metadata::xed-position not supported
++ [[ no = \y\e\s ]]
++ squash_filesystem
++ [[ no = \y\e\s ]]
++ mksquashfs myfs/ iso/live/filesystem.squashfs -noappend
++ tee /dev/fd/63
+++ yad '--title=Squashing filesystem...' --center --progress --pulsate --auto-close --width 300
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ [[ -n '' ]]
++ [[ no = \n\o ]]
++ rm -rf myfs
++ make_iso_fs
++ [[ yes = \y\e\s ]]
++ [[ -f /usr/lib/syslinux/mbr/isohdpfx.bin ]]
++ [[ -f /usr/lib/syslinux/isohdpfx.bin ]]
++ [[ -f /usr/lib/ISOLINUX/isohdpfx.bin ]]
++ isohybrid_opt='-isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin'
++ [[ -n liveiso ]]
++ xorriso -as mkisofs -r -J -joliet-long -l -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin -partition_offset 16 -V liveiso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o /home/snapshot/snapshot-20181209_1123.iso iso/
++ tee /dev/fd/63
+++ yad '--title=Creating CD/DVD image file...' --center --progress --pulsate --auto-close --width 300
+xorriso 1.4.2 : RockRidge filesystem manipulator, libburnia project.
+
+Drive current: -outdev 'stdio:/home/snapshot/snapshot-20181209_1123.iso'
+Media current: stdio file, overwriteable
+Media status : is blank
+Media summary: 0 sessions, 0 data blocks, 0 data, 20.7g free
+xorriso : WARNING : -volid text does not comply to ISO 9660 / ECMA 119 rules
+Added to ISO image: directory '/'='/home/work/iso'
+xorriso : UPDATE : 32 files added in 1 seconds
+xorriso : UPDATE : 32 files added in 1 seconds
+xorriso : NOTE : Copying to System Area: 432 bytes from file '/usr/lib/ISOLINUX/isohdpfx.bin'
+libisofs: NOTE : Automatically adjusted MBR geometry to 1022/138/32
+libisofs: NOTE : Aligned image size to cylinder size by 732 blocks
+xorriso : UPDATE :  0.01% done
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
+xorriso : UPDATE :  38.42% done
+xorriso : UPDATE :  88.97% done
+xorriso : UPDATE :  97.13% done
+ISO image produced: 1128288 sectors
+Written to medium : 1128288 sectors at LBA 0
+Writing to 'stdio:/home/snapshot/snapshot-20181209_1123.iso' completed successfully.
+
+
+(yad:2321): GLib-CRITICAL **: g_source_remove: assertion 'tag > 0' failed
++ [[ no = \y\e\s ]]
++ cleanup
++ [[ no = \n\o ]]
++ cd /
++ tee /dev/fd/63
+++ yad --title=Cleaning... --center --progress --pulsate --auto-close
++ rm -rf /home/work
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
+
+(yad:2327): GLib-CRITICAL **: g_source_remove: assertion 'tag > 0' failed
++ final_message
++ yad --image=gtk-dialog-info '--title=Refracta Snapshot' --center '--text=All finished! ' --width 200 --button=OK:0
+Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
++ exit 0
